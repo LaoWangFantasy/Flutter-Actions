@@ -23,24 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - 
-        id: check_tag
-        run: |
-          echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-          if git rev-parse "${{ inputs.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          fi
-      - 
-        if: env.TAG_EXISTS == 'true'
-        id: modify_tag
-        run: |
-          new_version="${{ inputs.version }}-build-${{ github.run_number }}"
-          echo "VERSION=$new_version" >> $GITHUB_ENV
-      - 
         id: push
         run: |
-          git tag ${{ env.VERSION }} && git push --tags
-          echo tag=${{ env.VERSION }} >> $GITHUB_OUTPUT
+          version="${{ inputs.version }}"
+          git tag $version && git push --tags
+          echo tag=$version >> $GITHUB_OUTPUT
         name: Push Tag
         shell: bash
