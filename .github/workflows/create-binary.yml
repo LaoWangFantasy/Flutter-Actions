@@ -25,7 +25,7 @@ jobs:
           PREFIX="build/${{ inputs.target }}"
           BIN="${{ inputs.target }}.tar.gz"
           BINN="$REPO_NAME-$BIN"
-          ls -al
+          tree -L 2
           tar -czf $BIN $PREFIX
           mv $BIN $BINN
           gh release upload ${{ inputs.tag }} $BINN
