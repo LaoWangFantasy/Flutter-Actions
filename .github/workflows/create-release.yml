@@ -6,7 +6,7 @@ env:
 on:
   workflow_call:
     inputs:
-      push_tag:
+      tag:
         default: '0'
         required: true
         type: string
@@ -33,5 +33,5 @@ jobs:
         name: Release
         shell: bash
         env:
-          PUSH_TAG: ${{ inputs.push_tag }}
+          PUSH_TAG: ${{ inputs.tag }}
           NOTE: ${{ inputs.note }}
