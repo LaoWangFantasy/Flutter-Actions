@@ -1,0 +1,29 @@
+name: create-binary
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CARGO_TERM_COLOR: always
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        default: '0'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - 
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          PREFIX="target/${{ inputs.target }}/release"
+          BIN="$PREFIX/$(ls -Sr $PREFIX | awk 'END {print $1}')""
+          BINN="$REPO_NAME-${{ inputs.target }}"
+          mv $BIN $BINN
+          gh release upload ${{ inputs.pushed_tag }} $BINN
+        shell: bash
+        name: Upload
