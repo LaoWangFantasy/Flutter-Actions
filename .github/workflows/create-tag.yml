@@ -25,12 +25,6 @@ jobs:
       - 
         id: push
         run: |
-          if git rev-parse "v${{ inputs.version }}" >/dev/null 2>&1; then
-            version="${{ inputs.version }}-build-${{ github.run_number }}"
-          else
-            version="${{ inputs.version }}"
-          fi
-          echo version:$version ...
           git tag $version && git push --tags
           echo tag=$version >> $GITHUB_OUTPUT
         name: Push Tag
