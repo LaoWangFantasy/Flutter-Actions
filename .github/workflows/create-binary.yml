@@ -10,7 +10,10 @@ on:
         default: '0'
         required: true
         type: string
-
+      target:
+        default: 'web'
+        required: true
+        type: string
 jobs:
   release:
     runs-on: ubuntu-24.04
@@ -19,10 +22,11 @@ jobs:
       - 
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
-          PREFIX="target/${{ inputs.target }}/release"
-          BIN="$PREFIX/$(ls -Sr $PREFIX | awk 'END {print $1}')""
-          BINN="$REPO_NAME-${{ inputs.target }}"
+          PREFIX="build/${{ inputs.target }}"
+          BIN="${{ inputs.target }}.tar.gz"
+          BINN="$REPO_NAME-$BIN"
+          tar -czf $BIN $PREFIX
           mv $BIN $BINN
-          gh release upload ${{ inputs.pushed_tag }} $BINN
+          gh release upload ${{ inputs.tag }} $BINN
         shell: bash
         name: Upload
