@@ -25,7 +25,7 @@ jobs:
       - 
         id: push
         run: |
-          if git rev-parse "${{ inputs.version }}" >/dev/null 2>&1; then
+          if git rev-parse "v${{ inputs.version }}" >/dev/null 2>&1; then
             version="${{ inputs.version }}-build-${{ github.run_number }}"
           else
             version="${{ inputs.version }}"
