@@ -26,7 +26,7 @@ jobs:
         id: check_tag
         run: |
           echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
-          if git rev-parse "${{ env.VERSION }}" >/dev/null 2>&1; then
+          if git rev-parse "${{ inputs.VERSION }}" >/dev/null 2>&1; then
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
           else
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
