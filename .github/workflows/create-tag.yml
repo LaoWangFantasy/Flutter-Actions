@@ -30,7 +30,6 @@ jobs:
           else
             version="${{ inputs.version }}"
           fi
-
           echo version:$version ...
           git tag $version && git push --tags
           echo tag=$version >> $GITHUB_OUTPUT
