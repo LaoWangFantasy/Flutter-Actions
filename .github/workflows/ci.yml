@@ -38,7 +38,7 @@ jobs:
     with:
       tag: ${{ needs.tag.outputs.tag }}
       note: "add release for ${{ needs.tag.outputs.tag }}"
-  call:
+  push:
     needs:
       - release
     uses: LaoWangFantasy/Flutter-Actions/.github/workflows/create-binary.yml@master
