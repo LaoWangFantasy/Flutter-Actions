@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       pfx: ${{ steps.pkcs.outputs.pfx }}
+    steps:
     - name: Set up OpenSSL
       run: |
         sudo apt-get update
@@ -31,17 +32,17 @@ jobs:
           -keyout privateKey.key \
           -out certificate.cer \
           -subj "/C=US/ST=State/L=City/O=Organization/OU=OrgUnit/CN=example.com"
-      - name: Generate PKCS12 certificate
-        id: pkcs
-        run: |
-          openssl pkcs12 -export \
-            -in certificate.cer \
-            -inkey privateKey.key \
-            -out signingCert.pfx \
-            -passout pass:${{ inputs.pkcs12-secret }}
-          echo "pfx=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
-      - name: Restore PFX Certificate
-        run: |
-          echo "${{ needs.pkcs12.outputs.pfx }}" | base64 -d > signingCert.pfx
-          # Verify the file was created correctly
-          ls -l signingCert.pfx
+    - name: Generate PKCS12 certificate
+      id: pkcs
+      run: |
+        openssl pkcs12 -export \
+          -in certificate.cer \
+          -inkey privateKey.key \
+          -out signingCert.pfx \
+          -passout pass:${{ inputs.pkcs12-secret }}
+        echo "pfx=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
+    - name: Restore PFX Certificate
+      run: |
+        echo "${{ steps.pkcs.outputs.pfx }}" | base64 -d > signingCert.pfx
+        # Verify the file was created correctly
+        ls -l signingCert.pfx
