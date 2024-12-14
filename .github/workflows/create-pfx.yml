@@ -1,0 +1,47 @@
+name: create-pfx
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+on:
+  workflow_call:
+    inputs:
+      pkcs12-secret:
+        default: '0'
+        required: true
+        type: string
+    outputs:
+      pfx-base64:
+        description: "Base64 Encoded String from signingCert.pfx"
+        value: ${{ jobs.create-pkcs12.outputs.pfx }}
+
+jobs:
+  create-pkcs12:
+    runs-on: ubuntu-24.04
+    outputs:
+      pfx: ${{ steps.pkcs.outputs.pfx }}
+    - name: Set up OpenSSL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssl
+    - name: Generate Certificate and Private Key
+      run: |
+        openssl req -newkey rsa:2048 \
+          -nodes -x509 -days 365 \
+          -keyout privateKey.key \
+          -out certificate.cer \
+          -subj "/C=US/ST=State/L=City/O=Organization/OU=OrgUnit/CN=example.com"
+      - name: Generate PKCS12 certificate
+        id: pkcs
+        run: |
+          openssl pkcs12 -export \
+            -in certificate.cer \
+            -inkey privateKey.key \
+            -out signingCert.pfx \
+            -passout pass:${{ inputs.pkcs12-secret }}
+          echo "pfx=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
+      - name: Restore PFX Certificate
+        run: |
+          echo "${{ needs.pkcs12.outputs.pfx }}" | base64 -d > signingCert.pfx
+          # Verify the file was created correctly
+          ls -l signingCert.pfx
