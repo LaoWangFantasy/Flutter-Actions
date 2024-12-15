@@ -29,6 +29,14 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y openssl
+    - name: Generate PFX file
+      id: x509
+      run: |
+        openssl genrsa -out signingCert.key 2048
+        openssl req -new -key signingCert.key -out signingCert.csr
+        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 3650
+        openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ inputs.pkcs12-secret }}
+
     - name: Generate Certificate and Private Key
       run: |
         openssl req -newkey rsa:2048 \
