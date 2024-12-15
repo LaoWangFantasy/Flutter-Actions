@@ -18,6 +18,9 @@ on:
       sha1:
         description: "SHA1 Hash of signingCert.pfx"
         value: ${{ jobs.create-pkcs12.outputs.sha1 }}
+      test:
+        description: "SHA1 Hash of signingCert.pfx"
+        value: ${{ jobs.create-pkcs12.outputs.test }}
 
 jobs:
   create-pfx:
@@ -27,6 +30,7 @@ jobs:
       pfx-sha1: ${{ steps.x509.outputs.pfx-sha1 }}
       base64: ${{ steps.base64.outputs.pfx }}
       sha1: ${{ steps.sha1.outputs.pfx }}
+      test: ${{ steps.x509.outputs.test}}
     steps:
     - name: Set up OpenSSL
       run: |
@@ -41,6 +45,7 @@ jobs:
         openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ secrets.WINDOWS_PFX_PASSWD }}
         echo "pfx-base64=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
         echo "pfx-sha1=$(sha1sum signingCert.pfx | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "test=23333" >> $GITHUB_OUTPUT
 
     - name: Generate Certificate and Private Key
       run: |
