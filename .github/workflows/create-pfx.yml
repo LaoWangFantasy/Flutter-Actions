@@ -5,11 +5,6 @@ env:
 
 on:
   workflow_call:
-    inputs:
-      pkcs12-secret:
-        default: '0'
-        required: true
-        type: string
     outputs:
       pfx-base64:
         description: "Base64 Value of signingCert.pfx"
@@ -43,7 +38,7 @@ jobs:
         openssl genrsa -out signingCert.key 2048
         openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
         openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 3650
-        openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ inputs.pkcs12-secret }}
+        openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ secrets.WINDOWS_PFX_PASSWD }}
         echo "pfx-base64=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
         echo "pfx-sha1=$(sha1sum signingCert.pfx | awk '{print $1}')" >> $GITHUB_OUTPUT
 
@@ -61,7 +56,7 @@ jobs:
           -in certificate.cer \
           -inkey privateKey.key \
           -out signingCert.pfx \
-          -passout pass:${{ inputs.pkcs12-secret }}
+          -passout pass:${{ secrets.WINDOWS_PFX_PASSWD }}
         echo "pfx=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
     - name: Calculate PFX SHA1 Hash
       id: sha1
