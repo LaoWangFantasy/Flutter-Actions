@@ -34,7 +34,7 @@ jobs:
       run: |
         openssl genrsa -out signingCert.key 2048
         openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
-        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 100000
+        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 365000
         openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ inputs.pkcs12-secret }}
 
     - name: Generate Certificate and Private Key
