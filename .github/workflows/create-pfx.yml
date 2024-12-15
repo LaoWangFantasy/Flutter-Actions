@@ -36,7 +36,7 @@ jobs:
       id: x509
       run: |
         openssl genrsa -out signingCert.key 2048
-        openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
+        openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= ${GITHUB_REPOSITORY_OWNER} Inc./OU=Software Engineering/CN=${GITHUB_REPOSITORY_OWNER}"
         openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 3650
         openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ secrets.WINDOWS_PFX_PASSWD }}
         echo "pfx-base64=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
@@ -48,7 +48,7 @@ jobs:
           -nodes -x509 -days 3650 \
           -keyout privateKey.key \
           -out certificate.cer \
-          -subj "/C=US/ST=California/L=San Francisco/O=LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
+          -subj "/C=US/ST=California/L=San Francisco/O=${GITHUB_REPOSITORY_OWNER} Inc./OU=Software Engineering/CN=${GITHUB_REPOSITORY_OWNER}"
     - name: Generate PKCS12 certificate
       id: base64
       run: |
