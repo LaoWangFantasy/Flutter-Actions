@@ -23,7 +23,7 @@ on:
         value: ${{ jobs.create-pkcs12.outputs.test }}
 
 jobs:
-  create-pfx:
+  create-pkcs12:
     runs-on: ubuntu-24.04
     outputs:
       pfx-base64: ${{ steps.x509.outputs.pfx-base64 }}
@@ -41,7 +41,7 @@ jobs:
       run: |
         openssl genrsa -out signingCert.key 2048
         openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= ${GITHUB_REPOSITORY_OWNER} Inc./OU=Software Engineering/CN=${GITHUB_REPOSITORY_OWNER}"
-        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 3650
+        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 36500
         openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ secrets.WINDOWS_PFX_PASSWD }}
         echo "pfx-base64=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
         echo "pfx-sha1=$(sha1sum signingCert.pfx | awk '{print $1}')" >> $GITHUB_OUTPUT
@@ -50,7 +50,7 @@ jobs:
     - name: Generate Certificate and Private Key
       run: |
         openssl req -newkey rsa:2048 \
-          -nodes -x509 -days 3650 \
+          -nodes -x509 -days 36500 \
           -keyout privateKey.key \
           -out certificate.cer \
           -subj "/C=US/ST=California/L=San Francisco/O=${GITHUB_REPOSITORY_OWNER} Inc./OU=Software Engineering/CN=${GITHUB_REPOSITORY_OWNER}"
