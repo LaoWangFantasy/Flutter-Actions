@@ -25,7 +25,7 @@ on:
         value: ${{ jobs.create-pkcs12.outputs.sha1 }}
 
 jobs:
-  create-pkcs12:
+  create-pfx:
     runs-on: ubuntu-24.04
     outputs:
       pfx-base64: ${{ steps.x509.outputs.pfx-base64 }}
