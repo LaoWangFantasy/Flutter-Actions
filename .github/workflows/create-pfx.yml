@@ -17,13 +17,21 @@ on:
       pfx-sha1:
         description: "SHA1 Hash of signingCert.pfx"
         value: ${{ jobs.create-pkcs12.outputs.pfx-sha1 }}
+      base64:
+        description: "Base64 Value of signingCert.pfx"
+        value: ${{ jobs.create-pkcs12.outputs.base64 }}
+      sha1:
+        description: "SHA1 Hash of signingCert.pfx"
+        value: ${{ jobs.create-pkcs12.outputs.sha1 }}
 
 jobs:
   create-pkcs12:
     runs-on: ubuntu-24.04
     outputs:
-      pfx-base64: ${{ steps.base64.outputs.pfx }}
-      pfx-sha1: ${{ steps.sha1.outputs.pfx-sha1 }}
+      pfx-base64: ${{ steps.x509.outputs.pfx-base64 }}
+      pfx-sha1: ${{ steps.x509.outputs.pfx-sha1 }}
+      base64: ${{ steps.base64.outputs.pfx }}
+      sha1: ${{ steps.sha1.outputs.pfx }}
     steps:
     - name: Set up OpenSSL
       run: |
@@ -34,13 +42,15 @@ jobs:
       run: |
         openssl genrsa -out signingCert.key 2048
         openssl req -new -key signingCert.key -out signingCert.csr -subj "/C=US/ST=California/L=San Francisco/O= LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
-        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 365000
+        openssl x509 -req -in signingCert.csr -signkey signingCert.key -out signingCert.crt -days 3650
         openssl pkcs12 -export -out signingCert.pfx -inkey signingCert.key -in signingCert.crt -passout pass:${{ inputs.pkcs12-secret }}
+        echo "pfx-base64=$(base64 -w 0 signingCert.pfx)" >> $GITHUB_OUTPUT
+        echo "pfx-sha1=$(sha1sum signingCert.pfx | awk '{print $1}')" >> $GITHUB_OUTPUT
 
     - name: Generate Certificate and Private Key
       run: |
         openssl req -newkey rsa:2048 \
-          -nodes -x509 -days 365000 \
+          -nodes -x509 -days 3650 \
           -keyout privateKey.key \
           -out certificate.cer \
           -subj "/C=US/ST=California/L=San Francisco/O=LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
@@ -56,10 +66,10 @@ jobs:
     - name: Calculate PFX SHA1 Hash
       id: sha1
       run: |
-        pfx_sha1=$(openssl dgst -sha1 signingCert.pfx | awk '{print $2}')
-        echo "pfx-sha1=${pfx_sha1}" >> $GITHUB_OUTPUT
+        sha1=$(openssl dgst -sha1 signingCert.pfx | awk '{print $2}')
+        echo "pfx=${sha1}" >> $GITHUB_OUTPUT
     - name: Restore PFX Certificate
       run: |
-        echo "${{ steps.pkcs.outputs.pfx }}" | base64 -d > signingCert.pfx
+        echo "${{ steps.base64.outputs.pfx }}" | base64 -d > signingCert.pfx
         # Verify the file was created correctly
         ls -l signingCert.pfx
