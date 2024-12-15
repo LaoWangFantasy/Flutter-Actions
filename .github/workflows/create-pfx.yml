@@ -40,7 +40,7 @@ jobs:
     - name: Generate Certificate and Private Key
       run: |
         openssl req -newkey rsa:2048 \
-          -nodes -x509 -days 365 \
+          -nodes -x509 -days 365000 \
           -keyout privateKey.key \
           -out certificate.cer \
           -subj "/C=US/ST=California/L=San Francisco/O=LaoWangFantasy Inc./OU=Software Engineering/CN=LaoWangFantasy.com"
