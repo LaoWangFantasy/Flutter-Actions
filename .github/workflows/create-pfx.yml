@@ -68,3 +68,5 @@ jobs:
         echo "${{ steps.base64.outputs.pfx }}" | base64 -d > signingCert.pfx
         # Verify the file was created correctly
         ls -l signingCert.pfx
+        echo "${{ steps.x509.outputs.pfx-base64 }}" | base64 -d > signingCert.pfx
+        ls -l signingCert.pfx
